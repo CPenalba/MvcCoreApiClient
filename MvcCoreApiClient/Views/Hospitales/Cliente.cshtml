@@ -1,0 +1,39 @@
+﻿@section Scripts{
+	<script>
+		$(document).ready(function(){
+			$("#botonhospitales").click(function(){
+				var url = "https://apicorehospitalescarolina.azurewebsites.net/api/hospitales";
+				$.ajax({
+					url:url,
+					method: "GET",
+					success: function(data){
+						var html = "";
+						$.each(data, function(index, hospital){
+							html += "<tr>";
+							html += "<td>" + hospital.nombre + "</td>";
+							html += "<td>" + hospital.direccion + "</td>";
+							html += "<td>" + hospital.telefono + "</td>";
+							html += "<td>" + hospital.camas + "</td>";
+							html += "</tr>";
+						})
+						$("#tablahospitales tbody").html(html)
+					}
+				})
+			})
+		})
+	</script>
+}
+
+<h1 style="color:blue">Consumo Api Hospitales Cliente</h1>
+<button id="botonhospitales" class="btn btn-warning">Load Hospitales</button>
+<table class="table table-bordered table-info" id="tablahospitales">
+	<thead>
+		<tr>
+			<th>Nombre</th>
+			<th>Direccion</th>
+			<th>Telefono</th>
+			<th>Camas</th>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
