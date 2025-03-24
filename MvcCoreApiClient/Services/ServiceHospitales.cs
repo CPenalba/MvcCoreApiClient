@@ -11,10 +11,34 @@ namespace MvcCoreApiClient.Services
         //NECESITAMOS INDICAR A NUESTRO SERVICE QUE LEEMOS CODIGO JSON
         private MediaTypeWithQualityHeaderValue header;
 
-        public ServiceHospitales()
+        public ServiceHospitales(IConfiguration configuration)
         {
-            this.ApiUrl = "https://apicorehospitalescarolina.azurewebsites.net/";
+            this.ApiUrl = configuration.GetValue<string>("ApiUrls:ApiHospitales");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
+        }
+
+        public async Task<Hospital> FindHospitalAsync(int idHospital)
+        {
+            using(HttpClient client = new HttpClient())
+            {
+                string request = "api/hospitales/" + idHospital;
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                HttpResponseMessage response = await client.GetAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    //SI LAS PROPIEDADES SE LLAMAN IGUAL A LA LECTURA DE JSON, 
+                    //NO ES NECESARIO MAPEAR CON LA DECORACION [JSONPROPERTY]
+                    //Y NO LEEREMOS CON NEWTONSOFT
+                    Hospital data = await response.Content.ReadAsAsync<Hospital>();
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         //CREAMOS UN METODO ASINCRONO PARA LEER LOS HOSPITALES
